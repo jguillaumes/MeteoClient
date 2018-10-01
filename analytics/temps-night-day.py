@@ -29,4 +29,5 @@ flattemps['Difference'] = flattemps.apply(lambda x: x[1] - x[2],axis=1)
 dailies = flattemps.set_index('timestamp').stack().reset_index()
 dailies.columns=['day','time','temperature']
 
-ggplot(dailies) + geom_point(aes(x='day',y='temperature',color='time')) + 
+ggplot(dailies) + geom_line(aes(x='day',y='temperature',color='time'))
+
