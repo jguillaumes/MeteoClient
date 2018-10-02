@@ -10,6 +10,7 @@
 
 
 import sys
+import os
 import sqlalchemy as sql
 import pandas as pd
 import datetime as dt
@@ -17,6 +18,7 @@ import datetime as dt
 dbUrl    = 'postgres://weather:weather@ct01.jguillaumes.dyndns.org/weather'
 sqlQuery = 'select time at time zone \'utc\' as time, temperature, pressure, humidity, light from weather where time between %(initial)s and %(final)s' 
 dbConn   = sql.create_engine(dbUrl)
+hdfDirectory = os.path.join(os.path.curdir, 'data')
 
 if len(sys.argv) != 2:
     print('Please specify the month to process as a line argument, format YYYYMM')
@@ -24,6 +26,9 @@ if len(sys.argv) != 2:
 else:
     monthParam = sys.argv[1]
 
+fileName = os.path.join(hdfDirectory,f'monthly-{monthParam}.hdf5')
+
+print(f'*** Begin process - output file {fileName}.')
 
 # ## Function to get the first and last days of the month to extract
 
@@ -55,9 +60,9 @@ def computeLimits(m):
 
 initial, final = computeLimits(monthParam)
 params = {'initial': initial, 'final': final}
-data = pd.read_sql_query(sqlQuery, dbConn, params=params).set_index('time')
-fileName = f'monthly-{monthParam}.hdf5'
+data = pd.read_sql_query(sqlQuery, dbConn, params=params)
 data.to_hdf(fileName,key='rawdata',mode='a',complevel=5)
+data = data.set_index('time')
 print('*** {0} raw rows saved in the hdf file.'.format(len(data)))
 
 
@@ -68,17 +73,16 @@ print('*** {0} raw rows saved in the hdf file.'.format(len(data)))
 
 # In[8]:
 
-
-data['daytime'] = data.apply(lambda x: 'Day' if x['light'] > 50 else 'Night', axis=1)
-byday = data.to_period('D').reset_index().groupby(['time','daytime']).agg(
-    {'time':'size',
-     'temperature':'mean',
+data['daytime'] = data.apply(lambda x: True if x['light'] > 50 else False, axis=1)
+byday = data.groupby([pd.Grouper(freq='D'),'daytime']).agg(
+    {'temperature':['size','mean'],
      'pressure': 'mean',
      'humidity':'mean',
-    'light':'mean'}
- )
+    'light':'mean'
+    })
 byday.columns=['count','temperature','pressure','humidity','light']
-byday = byday.reset_index().set_index(['time','daytime'])
+byday = byday.reset_index()
+byday.rename(columns={'time':'date'},inplace=True)
 byday.to_hdf(fileName,key='daily',mode='a',complevel=5)
 print('*** {0} daily summary rows saved in the hdf file.'.format(len(byday)))
 
@@ -89,16 +93,14 @@ print('*** {0} daily summary rows saved in the hdf file.'.format(len(byday)))
 
 # In[9]:
 
-
-byhour = data.to_period('H').reset_index().groupby('time').agg(
-    {'time':'size',
-    'temperature':'mean',
+byhour = data.groupby(pd.Grouper(freq='H')).agg(
+    {'temperature':['size','mean'],
     'pressure':'mean',
     'humidity':'mean',
-    'light':'mean'}
-)
+    'light':'mean'
+    })
 byhour.columns=['count','temperature','pressure','humidity','light']
-byhour = byhour.reset_index().set_index('time')
+byhour = byhour.reset_index()
 byhour.to_hdf(fileName,key='hourly',mode='a',complevel=5)
 print('*** {0} hourly summary rows saved in the hdf file.'.format(len(byhour)))
 
