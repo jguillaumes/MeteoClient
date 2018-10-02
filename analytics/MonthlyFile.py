@@ -11,6 +11,7 @@
 
 import sys
 import os
+import numpy as np
 import sqlalchemy as sql
 import pandas as pd
 import datetime as dt
@@ -73,7 +74,7 @@ print('*** {0} raw rows saved in the hdf file.'.format(len(data)))
 
 # In[8]:
 
-data['daytime'] = data.apply(lambda x: True if x['light'] > 50 else False, axis=1)
+data['daytime'] = data.apply(lambda x: 1 if x['light'] > 50 else 0, axis=1)
 byday = data.groupby([pd.Grouper(freq='D'),'daytime']).agg(
     {'temperature':['size','mean'],
      'pressure': 'mean',
