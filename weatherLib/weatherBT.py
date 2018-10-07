@@ -74,6 +74,7 @@ class WeatherBT(object):
             - line: string to send
         """
         self.theSocket.send(line)
+        self.theSocket.send("\r\n")
         
         
     def waitAnswer(self, answer,retries=5):
@@ -175,9 +176,17 @@ class WeatherBTThread(threading.Thread):
                     self._logger.logMessage(level="WARNING", message="Error in firmware/hardware: {0:s}".format(line))      
                 elif cmd == "HARDW":
                     self._logger.logMessage(level="CRITICAL",message=line)
+                elif cmd == "TIME?":
+                    self._logger.logMessage(level="INFO", message="Setting time as requested by the device.")
+                    now = tm.gmtime()   # So send current time to set RTC...
+                    timcmd = "TIME " + tm.strftime("%Y%m%d%H%M%S",now)
+                    self._logger.logMessage(level="INFO", 
+                                            message="Setting time, command: {0:s}".format(timcmd))
+                    gizmo.send(timcmd)
+                    gizmo.waitAnswer("OK-000")                    
                 elif cmd == "BEGIN":
                     now = tm.gmtime()   # So send current time to set RTC...
-                    timcmd = "TIME " + tm.strftime("%Y%m%d%H%M%S",now) + "\r"
+                    timcmd = "TIME " + tm.strftime("%Y%m%d%H%M%S",now)
                     self._logger.logMessage(level="INFO", 
                                             message="Setting time, command: {0:s}".format(timcmd))
                     gizmo.send(timcmd)

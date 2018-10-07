@@ -73,6 +73,8 @@ def parseLine(line):
     barometer=False
     hygrometer=False
     firmware=""
+    hardware=""
+    devName=""
     for t in tokens:
         if t == 'DATA ':
             pass # ignore header
@@ -95,7 +97,11 @@ def parseLine(line):
             thermometer = devList[1:2] == 'T'
             hygrometer  = devList[2:3] == 'H'
             barometer   = devList[3:4] == 'P'
-    return stamp,temp,humt,pres,lght,firmware,clock,thermometer,hygrometer,barometer    
+        elif t[0:1] == 'W':
+            hardware = t[1:]
+        elif t[0:1] == "N":
+            devName = t[1:]
+    return stamp,temp,humt,pres,lght,firmware,hardware,devName,clock,thermometer,hygrometer,barometer    
 
 def openFile(directory):
     """

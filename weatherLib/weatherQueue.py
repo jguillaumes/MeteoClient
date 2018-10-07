@@ -18,7 +18,8 @@ from time import sleep
 from weatherLib.weatherUtil import WLogger,parseLine
 
 _SELECT_TSA   = 'select maxtsa from tsas where day = ?'
-_INSERT_QUEUE = 'insert into queue(id, data, isES, isDB) values(?,?,0,0)'
+_INSERT_QUEUE = 'insert into queue(id, timeReceived, data, isES, isDB) ' + \
+                        'values(?,strftime(\'%Y-%m-%dT%H:%M:%f+00:00\',\'now\'),?,0,0)'
 _INSERT_DAY   = 'insert into tsas(day, maxtsa) values(?,1)'
 _UPDATE_TSA   = 'update tsas set maxtsa = ? where day = ?'
 _SELECT_DB    = 'select id,data,isDB from queue where isDB = 0 order by isDB,id'
@@ -74,7 +75,7 @@ class WeatherQueue(object):
         Push a line into the queue.
         This function blocks until the database is not locked
         """
-        stamp,_,_,_,_,_,_,_,_,_ = parseLine(line)
+        stamp,_,_,_,_,_,_,_,_,_,_,_ = parseLine(line)
         datestamp = calendar.timegm(stamp.date().timetuple())
         theTsa = 1
         

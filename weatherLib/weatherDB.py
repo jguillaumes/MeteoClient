@@ -15,10 +15,11 @@ from weatherLib.weatherDoc import WeatherData
 
 _INSERT_OBS = "insert into weather " + \
                                       "(tsa, time, temperature, humidity, pressure, " + \
-                                      "light, fwVersion, swVersion, version, " + \
+                                      "light, fwVersion, swVersion, version, hwVersion,devName," + \
                                       "isThermometer, isBarometer, isHygrometer, isClock, esDocId) " + \
                              "values (%(tsa)s, %(time)s, %(temperature)s, %(humidity)s, %(pressure)s, " + \
                                      "%(light)s, %(fwVersion)s, %(swVersion)s, %(version)s, " + \
+                                     "%(hwVersion)s, %(devName)s, " + \
                                      "%(isThermometer)s, %(isBarometer)s, %(isHygrometer)s, %(isClock)s, %(esDocId)s); " 
 
 
@@ -149,10 +150,11 @@ class WeatherDBThread(threading.Thread):
             for item in q:
                 line = item[1]
                 newTsa = item[0]
-                stamp,temp,humt,pres,lght,firmware,clock,thermometer,hygrometer,barometer = parseLine(line)
+                stamp,temp,humt,pres,lght,firmware,hardware,devName,clock,\
+                        thermometer,hygrometer,barometer = parseLine(line)
                 doc = WeatherData()
                 doc.init(_tsa=newTsa, _time=stamp, _temperature=temp, _humidity=humt, _pressure=pres, _light=lght,
-                         _fwVersion=firmware, _isBarometer=barometer, _isClock=clock,
+                         _fwVersion=firmware, _hwVersion=hardware, _devName=devName, _isBarometer=barometer, _isClock=clock,
                          _isThermometer=thermometer, _isHygrometer=hygrometer)
                 try:
                     self.theDb.insertObs(doc)

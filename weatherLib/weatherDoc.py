@@ -25,13 +25,15 @@ class WeatherData(DocType):
     version=Text()                          # Placeholder for document version
     fwVersion=Text()                        # Placeholder for firmware version
     swVersion=Text()                        # Placeholder for software version
+    hwVersion=Text()                        # Placeholder for hardware version
+    devName=Text()                          # Placeholder for device name
     isClock=Boolean()                       # Placeholder: clock present indicator
     isThermometer=Boolean()                 # Placeholder: thermometer present indicator
     isHygrometer=Boolean()                  # Placeholder: hybrometer present indicator
     isBarometer=Boolean()                   # Placeholder: Barometer present indicator
 
     def init(self,_tsa,_time,_temperature,_humidity,_pressure,_light,
-                 _fwVersion,_isClock,_isThermometer,
+                 _fwVersion,_hwVersion, _devName,_isClock,_isThermometer,
                  _isHygrometer,_isBarometer, _version=VERSION, _swVersion=SW_VERSION):
         """
         Set up the document attributes from the measurement variables and the
@@ -48,6 +50,8 @@ class WeatherData(DocType):
         self.version = _version
         self.fwVersion = _fwVersion
         self.swVersion = _swVersion
+        self.hwVersion = _hwVersion
+        self.devName = _devName
         self.isClock = _isClock
         self.isThermometer = _isThermometer
         self.isHygrometer = _isHygrometer

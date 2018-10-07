@@ -71,7 +71,7 @@ janitorThread.start()
 watchdogThread.start()
 
 try:
-    while True:
+    while True:     
         logger.logMessage("Timestamp")
         time.sleep(60)
                 

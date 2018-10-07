@@ -80,10 +80,11 @@ class WeatherESThread(threading.Thread):
             for item in q:
                 line = item[1]
                 newTsa = item[0]
-                stamp,temp,humt,pres,lght,firmware,clock,thermometer,hygrometer,barometer = parseLine(line)
+                stamp,temp,humt,pres,lght,firmware,hardware,devName,clock,thermometer,hygrometer,barometer = parseLine(line)
                 doc = WeatherData()
                 doc.init(_tsa=newTsa, _time=stamp, _temperature=temp, _humidity=humt, _pressure=pres, _light=lght,
-                         _fwVersion=firmware, _isBarometer=barometer, _isClock=clock,
+                         _fwVersion=firmware, _hwVersion=hardware, _devName=devName, 
+                         _isBarometer=barometer, _isClock=clock,
                          _isThermometer=thermometer, _isHygrometer=hygrometer)
                 try:
                     doc.save(client=self.theES.theClient)
