@@ -107,7 +107,7 @@ class WeatherBTThread(threading.Thread):
     """
     _logger = WLogger() 
 
-    def __init__(self,address, service, queue, event, directory):
+    def __init__(self,address, service, queue, event, directory, pollInterval=15):
         super(WeatherBTThread, self).__init__()
 
         self.name = 'WeatherBTThread'
@@ -116,6 +116,7 @@ class WeatherBTThread(threading.Thread):
         self.theEvent = event
         self.theAddress = address
         self.theService = service
+        self.thePollInterval = pollInterval
         self.theQueue = queue
         self._stopSwitch = False
         
@@ -190,6 +191,10 @@ class WeatherBTThread(threading.Thread):
                     self._logger.logMessage(level="INFO", 
                                             message="Setting time, command: {0:s}".format(timcmd))
                     gizmo.send(timcmd)
+                    gizmo.waitAnswer("OK-000")
+                    dlycmd = f"DLAY {self.thePollInterval:d}"
+                    self._logger.logMessage((f"Setting the poll interval, command: {dlycmd}"))
+                    gizmo.send(dlycmd)
                     gizmo.waitAnswer("OK-000")
                 else:
                     self._logger.logMessage(level="WARNING",message="Non-processable line: {0:s}".format(line))

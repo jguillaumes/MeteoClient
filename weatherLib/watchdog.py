@@ -64,7 +64,8 @@ class WatchdogThread(threading.Thread):
                                                service = t.theService,
                                                queue = t.theQueue,
                                                event = t.theEvent,
-                                               directory = t.theDirectory)
+                                               directory = t.theDirectory,
+                                               pollInterval = t.thePollInterval)
                     elif isinstance(t,QueueJanitorThread):
                         newT = QueueJanitorThread(qeue=t.theQueue,
                                                   period=t.thePeriod)

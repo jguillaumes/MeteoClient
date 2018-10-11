@@ -46,6 +46,17 @@ es_hosts = eval(config['elastic']['hosts'])
 janitor_period  = int(config['janitor']['period'])
 watchdog_period = int(config['watchdog']['period'])
 
+try:
+    period_config = config['period']
+    timestamp_period = int(period_config.get('timestamp','60'))
+    sensor_poll = int(period_config.get('polling','15'))
+except KeyError:
+    timestamp_period = 60
+    sensor_poll = 15
+
+logger.logMessage(f'Timestamp message will be written every {timestamp_period:d} seconds')
+logger.logMessage(f'Sensors will be polled every {sensor_poll:d} seconds.')
+
 wQueue = WeatherQueue(data_dir)
 wdb = WeatherDB(pg_host,pg_user,pg_password,pg_database)
 dbThread = WeatherDBThread(wQueue,wdb,dataEvent,pg_retry)
@@ -59,7 +70,8 @@ btThread = WeatherBTThread(address = w_address,
                            service = w_service,
                            queue   = wQueue,
                            event   = dataEvent,
-                           directory = data_dir)
+                           directory = data_dir,
+                           pollInterval = sensor_poll)
 
 threadList = [btThread, esThread, dbThread, janitorThread]
 watchdogThread = WatchdogThread(threadList,period=watchdog_period)
@@ -73,7 +85,7 @@ watchdogThread.start()
 try:
     while True:     
         logger.logMessage("Timestamp")
-        time.sleep(60)
+        time.sleep(timestamp_period)
                 
 except KeyboardInterrupt:
     logger.logMessage(level="INFO", message="Ending process, stopping worker threads.")
