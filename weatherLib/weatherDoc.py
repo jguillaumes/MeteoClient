@@ -70,6 +70,6 @@ class WeatherData(DocType):
             newIdx = 'weather-' + VERSION + '-' + day
             WeatherData._indexname = newIdx
             WeatherData._logger.logMessage(level="INFO",
-                                           message="Switching to new index {0}".format(newIdx))
+                                           message="Using index {0}".format(newIdx))
         return super().save(using=client, index=WeatherData._indexname, ** kwargs)
         
