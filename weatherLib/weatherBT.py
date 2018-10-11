@@ -2,6 +2,8 @@ import bluetooth as bt
 import time as tm
 import threading
 
+from datetime import datetime,date
+
 from weatherLib.weatherUtil import WLogger,openFile
 from weatherLib.weatherQueue import WeatherQueue
 
@@ -156,11 +158,19 @@ class WeatherBTThread(threading.Thread):
         if gizmo == None and not self._stopSwitch:
             raise ConnError
             
-            
-        f  = openFile(self.theDirectory)
+        currentDay = datetime.strptime('1970-01-01','%Y-%m-%d').date()  # Initialize to "zero" date
+        f = None
 
         self._logger.logMessage(message="Start weather processing.", level="INFO")    
         while not self._stopSwitch:
+            # Check date change and open new file if necessary
+            thisDay = datetime.utcnow().date()
+            if thisDay != currentDay:
+                currentDay = thisDay
+                if (f != None): f.close()
+                f  = openFile(self.theDirectory)
+                self._logger.logMessage(f'Opened raw log file for date {thisDay} : {f.name}')
+
             try:
                 line = gizmo.getLine()
                 cmd = line[0:5]
