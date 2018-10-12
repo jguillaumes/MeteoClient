@@ -16,15 +16,11 @@ password = weather
 retryDelay = 5
 
 [watchdog]
-period = 120
+period = 30
 
 [janitor]
-period = 60
+period = 300
 
 [period]
 timestamp = 300
 polling = 15
-
-
-
-
