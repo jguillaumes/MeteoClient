@@ -16,7 +16,7 @@ contained in the ``weatherLib``` directory.
 
 ### Required python environment
 
-This scripts require Python version 3. They require the following python modules to be installed:
+This scripts require Python version **3.6 or greater**. They require the following python modules to be installed:
 
 - pybluez
 - pytz
@@ -24,6 +24,10 @@ This scripts require Python version 3. They require the following python modules
 - elasticsearch-dsl
 - psycopg2
 - sqlite3
+
+Please note the current Raspbian distribution for the Raspberry pi platform **does not** include Python 3.6, nor there is (at the time of this writing) any installable 3.6 deb package. So, if you want to use these scripts you'll have to install 3.6 from sources. There are plenty of tutorials to do so; I used this one: http://www.knight-of-pi.org/installing-python3-6-on-a-raspberry-pi/
+
+Please be sure to have ```sqlite3-dev``` installed before building python. You will probably also want to have ```libgdbm-dev``` and ```libncurses5-dev``` too.
 
 ## ```tools``` directory
 
